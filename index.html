@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Skies - Weather</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body class="theme-default">
+
+  <!-- Animated Background -->
+  <div class="bg-scene" id="bgScene">
+    <div class="bg-layer bg-sky"></div>
+    <div class="bg-layer bg-sun" id="bgSun"></div>
+    <div class="bg-layer bg-clouds" id="bgClouds">
+      <div class="cloud c1"></div>
+      <div class="cloud c2"></div>
+      <div class="cloud c3"></div>
+    </div>
+    <div class="bg-layer bg-rain" id="bgRain"></div>
+    <div class="bg-layer bg-snow" id="bgSnow"></div>
+    <div class="bg-layer bg-stars" id="bgStars"></div>
+    <div class="bg-layer bg-lightning" id="bgLightning"></div>
+    <div class="bg-layer bg-overlay"></div>
+  </div>
+
+  <!-- Main App -->
+  <div class="app-wrapper">
+
+    <!-- Search Section -->
+    <header class="search-header">
+      <div class="brand">SKIES</div>
+      <div class="search-bar">
+        <input
+          type="text"
+          id="cityInput"
+          placeholder="Search city..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button id="searchBtn" aria-label="Search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-state" id="loadingState">
+      <div class="loader-ring"></div>
+      <p>Reading the skies...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="error-state" id="errorState">
+      <div class="error-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="currentColor"/>
+        </svg>
+      </div>
+      <p id="errorMsg">City not found. Try again.</p>
+    </div>
+
+    <!-- Weather Content -->
+    <main class="weather-content" id="weatherContent">
+
+      <!-- Hero Card -->
+      <section class="hero-card" id="heroCard">
+        <div class="hero-location">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          <span id="heroCity">--</span>
+          <span id="heroCountry" class="hero-country"></span>
+        </div>
+        <div class="hero-temp-row">
+          <div class="hero-temp" id="heroTemp">--</div>
+          <div class="hero-weather-icon" id="heroIcon"></div>
+        </div>
+        <div class="hero-condition" id="heroCondition">--</div>
+        <div class="hero-feels">
+          Feels like <span id="heroFeels">--</span>
+          &nbsp;&bull;&nbsp;
+          H:<span id="heroHigh">--</span> L:<span id="heroLow">--</span>
+        </div>
+        <div class="hero-date" id="heroDate"></div>
+      </section>
+
+      <!-- Stats Row -->
+      <section class="stats-grid">
+        <div class="stat-card" id="sc-humidity">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg>
+          </div>
+          <div class="stat-label">Humidity</div>
+          <div class="stat-value" id="statHumidity">--</div>
+          <div class="stat-bar-wrap"><div class="stat-bar" id="barHumidity"></div></div>
+        </div>
+        <div class="stat-card" id="sc-wind">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+          </div>
+          <div class="stat-label">Wind</div>
+          <div class="stat-value" id="statWind">--</div>
+          <div class="stat-sub" id="statWindDir">--</div>
+        </div>
+        <div class="stat-card" id="sc-uv">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          </div>
+          <div class="stat-label">UV Index</div>
+          <div class="stat-value" id="statUV">--</div>
+          <div class="stat-sub" id="statUVLabel">--</div>
+        </div>
+        <div class="stat-card" id="sc-vis">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div class="stat-label">Visibility</div>
+          <div class="stat-value" id="statVis">--</div>
+        </div>
+        <div class="stat-card" id="sc-pressure">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-label">Pressure</div>
+          <div class="stat-value" id="statPressure">--</div>
+        </div>
+        <div class="stat-card" id="sc-dew">
+          <div class="stat-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6 2 2 7 2 12a10 10 0 0 0 20 0c0-5-4-10-10-10z"/></svg>
+          </div>
+          <div class="stat-label">Dew Point</div>
+          <div class="stat-value" id="statDew">--</div>
+        </div>
+      </section>
+
+      <!-- Rain Chance + Sun Times -->
+      <section class="mid-row">
+        <div class="rain-card">
+          <div class="rain-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="8" y1="20" x2="8.01" y2="20"/><line x1="12" y1="18" x2="12.01" y2="18"/><line x1="12" y1="22" x2="12.01" y2="22"/><line x1="16" y1="16" x2="16.01" y2="16"/><line x1="16" y1="20" x2="16.01" y2="20"/></svg>
+            Rain Chance
+          </div>
+          <div class="rain-percent" id="rainPercent">--%</div>
+          <div class="rain-arc-wrap">
+            <svg class="rain-arc" viewBox="0 0 120 70">
+              <path class="arc-bg" d="M10 65 A 50 50 0 0 1 110 65" />
+              <path class="arc-fill" id="rainArc" d="M10 65 A 50 50 0 0 1 110 65" stroke-dasharray="0 157" />
+            </svg>
+          </div>
+          <div class="rain-desc" id="rainDesc">--</div>
+        </div>
+
+        <div class="sun-card">
+          <div class="sun-header">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            Sun
+          </div>
+          <div class="sun-row">
+            <div class="sun-item">
+              <div class="sun-label">Rise</div>
+              <div class="sun-time" id="sunRise">--</div>
+            </div>
+            <div class="sun-arc-mini">
+              <svg viewBox="0 0 80 50">
+                <path class="arc-bg-mini" d="M5 45 A 35 35 0 0 1 75 45"/>
+                <circle class="sun-dot" id="sunDot" cx="5" cy="45" r="4"/>
+              </svg>
+            </div>
+            <div class="sun-item">
+              <div class="sun-label">Set</div>
+              <div class="sun-time" id="sunSet">--</div>
+            </div>
+          </div>
+          <div class="daylight-label">Daylight: <span id="daylightHours">--</span></div>
+        </div>
+      </section>
+
+      <!-- Hourly Forecast -->
+      <section class="hourly-section">
+        <div class="section-title">Hourly</div>
+        <div class="hourly-scroll" id="hourlyScroll">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+      <!-- 7-Day Forecast -->
+      <section class="weekly-section">
+        <div class="section-title">7-Day Forecast</div>
+        <div class="weekly-list" id="weeklyList">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+      <!-- AQI Card -->
+      <section class="aqi-card" id="aqiCard">
+        <div class="aqi-header">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h4M18 12h4M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+          Air Quality
+        </div>
+        <div class="aqi-value-row">
+          <div class="aqi-number" id="aqiNumber">--</div>
+          <div class="aqi-label" id="aqiLabel">--</div>
+        </div>
+        <div class="aqi-bar-wrap">
+          <div class="aqi-bar-track">
+            <div class="aqi-bar-fill" id="aqiBarFill"></div>
+          </div>
+          <div class="aqi-ticks">
+            <span>Good</span><span>Fair</span><span>Mod</span><span>Poor</span><span>Very Poor</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="app-footer">
+        Powered by Open-Meteo &amp; Geocoding API &bull; Data updates every 15 min
+      </footer>
+
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
